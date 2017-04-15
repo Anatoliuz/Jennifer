@@ -9,5 +9,8 @@ Android app to save photo in your profile with elliptic curve cryptography
 
 As Jay Lo said:
 
-> We're living the future so
-> the present is our past.
+>Women should never go without earrings.
+>Passing on them is an opportunity missed.
+
+
+***tech-mail.ru***
