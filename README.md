@@ -1,5 +1,5 @@
-###Jennifer app
-####Description
+**Jennifer app**
+***Description***
 Android app to save photo in your profile with elliptic curve cryptography 
 
 
