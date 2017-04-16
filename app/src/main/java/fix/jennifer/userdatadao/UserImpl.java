@@ -24,4 +24,9 @@ public class UserImpl extends BaseDaoImpl<User, Integer> {
     public void setNewUsers(User user) throws SQLException{
         this.create(user);
     }
+
+//    public List<User> getUserByLogin(String str) throws  SQLException{
+//        return this.queryForEq("login", str );
+//    }
+
 }

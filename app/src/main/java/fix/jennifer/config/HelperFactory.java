@@ -17,7 +17,7 @@ public class HelperFactory {
         dataBaseHelper = OpenHelperManager.getHelper(context, DataBaseHelper.class);
     }
 
-    public void releaseHelper(){
+    public static void releaseHelper(){
         OpenHelperManager.releaseHelper();
         dataBaseHelper = null;
     }
