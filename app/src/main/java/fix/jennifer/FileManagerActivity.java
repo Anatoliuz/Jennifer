@@ -17,16 +17,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 import java.io.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+
 
 import fix.jennifer.config.HelperFactory;
 import fix.jennifer.dbexecutor.executorCreateUser;
 
 public class FileManagerActivity extends AppCompatActivity {
     private FilesAdapter adapter;
-    private executorCreateUser executorCreateUser;
-    private final Executor executor = Executors.newCachedThreadPool();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +64,6 @@ public class FileManagerActivity extends AppCompatActivity {
             }
         });
         //HelperFactory.setHelper(getApplicationContext());
-TestDb();
     }
 
     @Override
@@ -96,16 +93,5 @@ TestDb();
         }
     }
 
-    public void TestDb(){
-           HelperFactory.setHelper(getApplicationContext());
-//
-        String login = "a";
-        String password =  "a";
-        String curve_1 = "a";
-        String curve_2 = "a";
-        Log.d("Test db", "onClick: title content link"+ login + password + curve_1 + curve_2);
-       executorCreateUser = new executorCreateUser(login, password, curve_1, curve_2);
-        executor.execute(executorCreateUser);
-      Log.d("Test db", "onClick: createUser");
-    }
+
 }

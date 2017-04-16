@@ -32,6 +32,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import fix.jennifer.config.DataBaseHelper;
 import fix.jennifer.config.HelperFactory;
+import fix.jennifer.dbexecutor.executorCreateUser;
 import fix.jennifer.userdatadao.User;
 import fix.jennifer.userdatadao.UserImpl;
 
@@ -39,13 +40,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.Manifest.permission.PACKAGE_USAGE_STATS;
 import static android.Manifest.permission.READ_CONTACTS;
 
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 /**
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
-
+    private executorCreateUser executorCreateUser;
+    private final Executor executor = Executors.newCachedThreadPool();
     private UserImpl user;
 
 
@@ -334,20 +340,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                     List<User> users = HelperFactory.getHelper().getUserDAO().getAllUsers();
                    boolean isHere =  isUserInDb(users, mEmail);
-                   str = Boolean.toString(isHere);
-                    Log.d("LOGINN", str);
-                    return true;
+                  if (isHere) {
+                      User user = getUserByLogin(users, mEmail);
+                      if (user.getPassword().equals(mPassword)){
+                          str = Boolean.toString(isHere);
+                          Log.d("LOGINN", str);
+                          return true;
+                      }
+
+                  }
                 }catch (SQLException e){
                     Log.e("in login attempt link", e.toString());
                 }
 
-//            for (String credential : DUMMY_CREDENTIALS) {
-//                String[] pieces = credential.split(":");
-//                if (pieces[0].equals(mEmail)) {
-//                    // Account exists, return true if the password matches.
-//                    return pieces[1].equals(mPassword);
-//                }
-//            }
+                CreateUserInDb(mEmail, mPassword, "a", "a");
 
             // TODO: register the new account here.
             return false;
@@ -382,6 +388,25 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         }
         return false;
+    }
+
+    public User getUserByLogin(List<User> users, String login) {
+        for (User user : users) {
+            if (user.getLogin().equals(login)) {
+                return user;
+            }
+        }
+        return null;
+    }
+    public void CreateUserInDb( String login, String password, String curve_1,
+                                String curve_2 ){
+
+        HelperFactory.setHelper(getApplicationContext());
+
+        Log.d("CreateUserInDb db", "onClick: title content link"+ login + password + curve_1 + curve_2);
+        executorCreateUser = new executorCreateUser(login, password, curve_1, curve_2);
+        executor.execute(executorCreateUser);
+        Log.d("Test db", "onClick: createUser");
     }
 }
 
