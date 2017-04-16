@@ -50,6 +50,7 @@ import java.util.concurrent.Executors;
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+
     private executorCreateUser executorCreateUser;
     private final Executor executor = Executors.newCachedThreadPool();
     private UserImpl user;
@@ -64,9 +65,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * A dummy authentication store containing known user names and passwords.
      * TODO: remove after connecting to a real authentication system.
      */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
+//    private static final String[] DUMMY_CREDENTIALS = new String[]{
+//            "foo@example.com:hello", "bar@example.com:world"
+//    };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -334,21 +335,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 return false;
             }
 
-                try{
-                String str;
+                try {
+                    String str;
                     HelperFactory.setHelper(getApplicationContext());
-
                     List<User> users = HelperFactory.getHelper().getUserDAO().getAllUsers();
-                   boolean isHere =  isUserInDb(users, mEmail);
-                  if (isHere) {
-                      User user = getUserByLogin(users, mEmail);
-                      if (user.getPassword().equals(mPassword)){
-                          str = Boolean.toString(isHere);
-                          Log.d("LOGINN", str);
-                          return true;
-                      }
-
-                  }
+                    boolean isHere = isUserInDb(users, mEmail);
+                    if (isHere) {
+                        User user = getUserByLogin(users, mEmail);
+                        if (user.getPassword().equals(mPassword)) {
+                            str = Boolean.toString(isHere);
+                            HelperFactory.getHelper().setUserId(user.getmId());
+                            Log.d("LOGINN", str);
+                            return true;
+                        }
+                    }
                 }catch (SQLException e){
                     Log.e("in login attempt link", e.toString());
                 }
@@ -402,7 +402,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                 String curve_2 ){
 
         HelperFactory.setHelper(getApplicationContext());
-
         Log.d("CreateUserInDb db", "onClick: title content link"+ login + password + curve_1 + curve_2);
         executorCreateUser = new executorCreateUser(login, password, curve_1, curve_2);
         executor.execute(executorCreateUser);

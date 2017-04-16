@@ -21,6 +21,8 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
 
     private static final int DATABASE_VERSION = 8;
 
+    private static int userId;
+
     private UserImpl userDAO =  null;
 
     public DataBaseHelper(Context context){
@@ -61,6 +63,13 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
     public void close(){
         super.close();
         userDAO = null;
+    }
+    public static void setUserId(int id){
+        userId = id;
+    }
+
+    public static int getUserId(){
+        return userId;
     }
 
 }

@@ -7,6 +7,8 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
  * Created by fix on 16.04.17.
  */
 public class HelperFactory {
+
+
     private static DataBaseHelper dataBaseHelper;
 
     public static DataBaseHelper getHelper(){
@@ -21,4 +23,6 @@ public class HelperFactory {
         OpenHelperManager.releaseHelper();
         dataBaseHelper = null;
     }
+
+
 }

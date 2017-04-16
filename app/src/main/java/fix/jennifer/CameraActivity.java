@@ -24,6 +24,7 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.format.Time;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -32,15 +33,17 @@ import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+import fix.jennifer.config.HelperFactory;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 public class CameraActivity extends AppCompatActivity {
     private static final String TAG = "AndroidCameraApi";
     private Button takePictureButton;
@@ -167,7 +170,22 @@ public class CameraActivity extends AppCompatActivity {
             // Orientation
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
-            final File file = new File(getFilesDir().getAbsolutePath()+"/pic.jpg");
+
+            int folderId =  HelperFactory.getHelper().getUserId();
+            String intstr;
+            intstr = Integer.toString(folderId);
+            String folder_main = intstr;
+
+            File f = new File(getFilesDir().getAbsolutePath(), folder_main);
+            if (!f.exists()) {
+                f.mkdirs();
+            }
+            String userSpacePath = getFilesDir().getAbsolutePath()+"/"+folder_main;
+
+            Time now = new Time();
+            now.setToNow();
+
+            final File file = new File(userSpacePath+"/" +now.format("%d%m%Y%H%M%S"));
             ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
                 @Override
                 public void onImageAvailable(ImageReader reader) {

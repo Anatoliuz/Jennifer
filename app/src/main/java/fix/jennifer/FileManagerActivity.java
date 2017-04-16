@@ -23,8 +23,9 @@ import fix.jennifer.config.HelperFactory;
 import fix.jennifer.dbexecutor.executorCreateUser;
 
 public class FileManagerActivity extends AppCompatActivity {
-    private FilesAdapter adapter;
 
+    private String userSpacePath;
+    private FilesAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +49,19 @@ public class FileManagerActivity extends AppCompatActivity {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
+        int folderId =  HelperFactory.getHelper().getUserId();
+        String intstr;
+        intstr = Integer.toString(folderId);
+        String folder_main = intstr;
 
-        adapter.setDirectory(new File(getFilesDir().getAbsolutePath()));
+        File f = new File(getFilesDir().getAbsolutePath(), folder_main);
+        if (!f.exists()) {
+            f.mkdirs();
+        }
+        userSpacePath = getFilesDir().getAbsolutePath()+"/"+folder_main;
+        adapter.setDirectory(new File(userSpacePath) );
+
+
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.files);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -63,14 +75,11 @@ public class FileManagerActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        //HelperFactory.setHelper(getApplicationContext());
     }
 
     @Override
     public void onBackPressed() {
         if (!adapter.goBack()) {
-          //  TestDb();
-
             super.onBackPressed();
         }
     }
@@ -92,6 +101,11 @@ public class FileManagerActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    public String getUserSpacePath(){
+        return getUserSpacePath();
+    }
+
 
 
 }
