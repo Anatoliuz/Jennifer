@@ -1,6 +1,7 @@
 package fix.jennifer;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -21,8 +22,11 @@ class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.FileViewHolder> {
 
     private File[] files;
     private File currentFile;
+    private Context context;
+
 
     FilesAdapter(final Context context) {
+        this.context = context;
         layoutInflater = LayoutInflater.from(context);
     }
 
@@ -93,6 +97,9 @@ class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.FileViewHolder> {
                 public void onClick(View v) {
                     if (file.isDirectory()) {
                         FilesAdapter.this.setDirectory(file);
+                    }
+                    else{
+                        context.startActivity(new Intent(context.getApplicationContext(), LoginActivity.class));
                     }
                 }
             });
