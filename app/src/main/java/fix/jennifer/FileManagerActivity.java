@@ -16,34 +16,40 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-
 import java.io.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
+import fix.jennifer.config.HelperFactory;
+import fix.jennifer.dbexecutor.executorCreateUser;
 
 public class FileManagerActivity extends AppCompatActivity {
     private FilesAdapter adapter;
+    private executorCreateUser executorCreateUser;
+    private final Executor executor = Executors.newCachedThreadPool();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_file_manager);
-      generateNoteOnSD(getApplicationContext(), "sss", "sss");
+          setContentView(R.layout.activity_file_manager);
+         generateNoteOnSD(getApplicationContext(), "sss", "sss");
 
         adapter = new FilesAdapter(this);
        //  String user_path = getFilesDir().getAbsolutePath();
     // Log.d("APP PATYH", user_path);
         //  String user_path = (String)Environment.getRootDirectory();
-
-        String filename = "myfile";
-        String string = "Hello world!";
-        FileOutputStream outputStream;
-
-        try {
-            outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
-            outputStream.write(string.getBytes());
-            outputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//
+//        String filename = "myfile";
+//        String string = "Hello world!";
+//        FileOutputStream outputStream;
+//
+//        try {
+//            outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+//            outputStream.write(string.getBytes());
+//            outputStream.close();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         adapter.setDirectory(new File(getFilesDir().getAbsolutePath()));
 
@@ -59,11 +65,15 @@ public class FileManagerActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        //HelperFactory.setHelper(getApplicationContext());
+TestDb();
     }
 
     @Override
     public void onBackPressed() {
         if (!adapter.goBack()) {
+          //  TestDb();
+
             super.onBackPressed();
         }
     }
@@ -84,5 +94,18 @@ public class FileManagerActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void TestDb(){
+           HelperFactory.setHelper(getApplicationContext());
+//
+        String login = "a";
+        String password =  "a";
+        String curve_1 = "a";
+        String curve_2 = "a";
+        Log.d("Test db", "onClick: title content link"+ login + password + curve_1 + curve_2);
+       executorCreateUser = new executorCreateUser(login, password, curve_1, curve_2);
+        executor.execute(executorCreateUser);
+      Log.d("Test db", "onClick: createUser");
     }
 }
