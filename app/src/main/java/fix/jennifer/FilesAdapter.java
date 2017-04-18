@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import fix.jennifer.config.HelperFactory;
 
 import java.io.File;
 import java.util.Arrays;
@@ -39,7 +40,15 @@ class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.FileViewHolder> {
 
     boolean goBack() {
         File parent = currentFile.getParentFile();
-        if (parent != null) {
+        int folderId =  HelperFactory.getHelper().getUserId();
+        String intstr;
+        intstr = Integer.toString(folderId);
+        String folder_main = intstr;
+
+        String userSpacePath = context.getFilesDir().getAbsolutePath()+"/"+folder_main;
+        String parentPath = parent.toString() + "/" + intstr ;
+        String appPath =  parent.toString();
+        if (parent != null &&  !appPath.equals(parent.toString()) && !userSpacePath.equals( parentPath )) {
             setDirectory(parent);
             return true;
         }

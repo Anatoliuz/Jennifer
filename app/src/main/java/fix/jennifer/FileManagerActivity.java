@@ -31,24 +31,9 @@ public class FileManagerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
           setContentView(R.layout.activity_file_manager);
-         generateNoteOnSD(getApplicationContext(), "sss", "sss");
 
         adapter = new FilesAdapter(this);
-       //  String user_path = getFilesDir().getAbsolutePath();
-    // Log.d("APP PATYH", user_path);
-        //  String user_path = (String)Environment.getRootDirectory();
-//
-//        String filename = "myfile";
-//        String string = "Hello world!";
-//        FileOutputStream outputStream;
-//
-//        try {
-//            outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
-//            outputStream.write(string.getBytes());
-//            outputStream.close();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+
         int folderId =  HelperFactory.getHelper().getUserId();
         String intstr;
         intstr = Integer.toString(folderId);
@@ -83,24 +68,7 @@ public class FileManagerActivity extends AppCompatActivity {
             super.onBackPressed();
         }
     }
-    public void generateNoteOnSD(Context context, String sFileName, String sBody) {
-        try {
-            String user_path = getFilesDir().getAbsolutePath();
 
-            File root = new File(user_path, "Notes");
-            if (!root.exists()) {
-                root.mkdirs();
-            }
-            File gpxfile = new File(root, sFileName);
-            FileWriter writer = new FileWriter(gpxfile);
-            writer.append(sBody);
-            writer.flush();
-            writer.close();
-            Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public String getUserSpacePath(){
         return getUserSpacePath();
