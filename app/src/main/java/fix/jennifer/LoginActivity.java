@@ -363,15 +363,24 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
             showProgress(false);
-
-            if (success) {
-                finish();
-                Intent mainIntent = new Intent(LoginActivity.this, FileManagerActivity.class);
-                LoginActivity.this.startActivity(mainIntent);
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
+           try {
+               List<User> users = HelperFactory.getHelper().getUserDAO().getAllUsers();
+               if (success) {
+                   finish();
+                   Intent mainIntent = new Intent(LoginActivity.this, FileManagerActivity.class);
+                   LoginActivity.this.startActivity(mainIntent);
+               } else if (getUserByLogin(users, mEmail) == null) {
+                   {
+                       mPasswordView.setError(getString(R.string.registered));
+                       mPasswordView.requestFocus();
+                   }
+               } else {
+                   mPasswordView.setError(getString(R.string.error_incorrect_password));
+                   mPasswordView.requestFocus();
+               }
+           } catch (SQLException e){
+               Log.e("in login attempt link", e.toString());
+           }
         }
 
         @Override
@@ -400,7 +409,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
     public void CreateUserInDb( String login, String password, String curve_1,
                                 String curve_2 ){
-
         HelperFactory.setHelper(getApplicationContext());
         Log.d("CreateUserInDb db", "onClick: title content link"+ login + password + curve_1 + curve_2);
         executorCreateUser = new executorCreateUser(login, password, curve_1, curve_2);
