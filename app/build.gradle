@@ -24,14 +24,14 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     1
     compile 'com.android.support:design:22.2.1'
+    compile 'net.zetetic:android-database-sqlcipher:3.5.7'
 
     compile 'com.android.support:recyclerview-v7:21.0.+'
-// https://mvnrepository.com/artifact/com.j256.ormlite/ormlite-android
     compile group: 'com.j256.ormlite', name: 'ormlite-android', version: '5.0'
-
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:support-v13:23.2.0'
+
     testCompile 'junit:junit:4.12'
 }

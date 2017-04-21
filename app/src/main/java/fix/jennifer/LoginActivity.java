@@ -30,9 +30,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import fix.jennifer.config.DataBaseHelper;
 import fix.jennifer.config.HelperFactory;
-import fix.jennifer.dbexecutor.executorCreateUser;
+import fix.jennifer.dbexecutor.ExecutorCreateUser;
 import fix.jennifer.userdatadao.User;
 import fix.jennifer.userdatadao.UserImpl;
 
@@ -40,10 +39,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.Manifest.permission.PACKAGE_USAGE_STATS;
 import static android.Manifest.permission.READ_CONTACTS;
 
 
+import java.util.Random;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 /**
@@ -51,7 +50,7 @@ import java.util.concurrent.Executors;
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
-    private executorCreateUser executorCreateUser;
+    private ExecutorCreateUser ExecutorCreateUser;
     private final Executor executor = Executors.newCachedThreadPool();
     private UserImpl user;
 
@@ -337,6 +336,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                 try {
                     String str;
+                    Random rand = new Random();
+                    if(rand.nextInt(10) == 5)
+                        throw new SQLException();
                     HelperFactory.setHelper(getApplicationContext());
                     List<User> users = HelperFactory.getHelper().getUserDAO().getAllUsers();
                     boolean isHere = isUserInDb(users, mEmail);
@@ -353,7 +355,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     Log.e("in login attempt link", e.toString());
                 }
 
-                CreateUserInDb(mEmail, mPassword, "a", "a");
+                createUserInDb(mEmail, mPassword, "a", "a");
 
             // TODO: register the new account here.
             return false;
@@ -407,12 +409,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
         return null;
     }
-    public void CreateUserInDb( String login, String password, String curve_1,
+    public void createUserInDb( String login, String password, String curve_1,
                                 String curve_2 ){
         HelperFactory.setHelper(getApplicationContext());
         Log.d("CreateUserInDb db", "onClick: title content link"+ login + password + curve_1 + curve_2);
-        executorCreateUser = new executorCreateUser(login, password, curve_1, curve_2);
-        executor.execute(executorCreateUser);
+        ExecutorCreateUser = new ExecutorCreateUser(login, password, curve_1, curve_2);
+        executor.execute(ExecutorCreateUser);
         Log.d("Test db", "onClick: createUser");
     }
 }

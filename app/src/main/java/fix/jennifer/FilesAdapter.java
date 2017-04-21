@@ -25,7 +25,6 @@ class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.FileViewHolder> {
     private File currentFile;
     private Context context;
 
-
     FilesAdapter(final Context context) {
         this.context = context;
         layoutInflater = LayoutInflater.from(context);
@@ -50,7 +49,7 @@ class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.FileViewHolder> {
         String appPath =  parent.toString();
         if (parent != null &&  !appPath.equals(parent.toString()) && !userSpacePath.equals( parentPath )) {
             setDirectory(parent);
-            return true;
+            return false;
         }
         return false;
     }
@@ -108,7 +107,7 @@ class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.FileViewHolder> {
                         FilesAdapter.this.setDirectory(file);
                     }
                     else{
-                        context.startActivity(new Intent(context.getApplicationContext(), LoginActivity.class));
+                        context.startActivity(new Intent(context.getApplicationContext(), ImageView.class));
                     }
                 }
             });

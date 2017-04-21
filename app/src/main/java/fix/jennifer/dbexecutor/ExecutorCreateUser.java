@@ -9,13 +9,13 @@ import java.sql.SQLException;
 /**
  * Created by fix on 16.04.17.
  */
-public class executorCreateUser implements Runnable {
+public class ExecutorCreateUser implements Runnable {
     private String login;
     private String password;
     private String curve_1;
     private String curve_2;
 
-    public executorCreateUser(String login, String password, String curve_1, String curve_2){
+    public ExecutorCreateUser(String login, String password, String curve_1, String curve_2){
         this.login = login;
         this.password = password;
         this.curve_1 = curve_1;
