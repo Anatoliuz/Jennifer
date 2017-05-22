@@ -32,7 +32,7 @@ public class DefaultExecutorSupplier{
 
             // setting the thread factory
             ThreadFactory backgroundPriorityThreadFactory = new
-                    PriorityThreadFactory(Process.THREAD_PRIORITY_BACKGROUND);
+                    PriorityThreadFactory(Process.THREAD_PRIORITY_FOREGROUND);
 
             // setting the thread pool executor for mForBackgroundTasks;
             mForBackgroundTasks = new ThreadPoolExecutor(

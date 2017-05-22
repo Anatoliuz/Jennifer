@@ -1,12 +1,8 @@
 package fix.jennifer;
 
 import android.content.Intent;
-
 import android.support.v7.app.AppCompatActivity;
-
-
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -27,13 +23,12 @@ import java.util.Random;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
 public class LoginActivity extends AppCompatActivity  {
 
     private ExecutorCreateUser ExecutorCreateUser;
     private final Executor executor = Executors.newCachedThreadPool();
-    private UserImpl user;
 
-    boolean isAuthCompleted;
     private UserLoginTask mAuthTask = null;
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
@@ -44,7 +39,6 @@ public class LoginActivity extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        isAuthCompleted = false;
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
 
         mPasswordView = (EditText) findViewById(R.id.password);
@@ -76,8 +70,11 @@ public class LoginActivity extends AppCompatActivity  {
     private void attemptLogin() {
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
-        mAuthTask = new UserLoginTask(email, password);
+        if (mAuthTask == null )
+             mAuthTask = new UserLoginTask(email, password);
         mAuthTask.auth();
+
+
     }
 
 
@@ -92,15 +89,16 @@ public class LoginActivity extends AppCompatActivity  {
         }
 
         protected void auth() {
-            Future future = DefaultExecutorSupplier.getInstance().forBackgroundTasks()
-                    .submit(new Runnable() {
+
+            DefaultExecutorSupplier.getInstance().forBackgroundTasks()
+                    .execute(new Runnable() {
                         @Override
                         public void run() {
                             try {
                                 String str;
                                 Random rand = new Random();
-//                                if(rand.nextInt(10) == 5)
-//                                    throw new SQLException();
+                                if(rand.nextInt(1) == 0)
+                                    throw new SQLException();
                                 HelperFactory.setHelper(getApplicationContext());
                                 List<User> users = HelperFactory.getHelper().getUserDAO().getAllUsers();
                                 boolean isHere = isUserInDb(users, mEmail);
@@ -110,7 +108,6 @@ public class LoginActivity extends AppCompatActivity  {
                                         str = Boolean.toString(isHere);
                                         HelperFactory.getHelper().setUserId(user.getmId());
                                         Log.d("LOGINN", str);
-                                        isAuthCompleted = true;
                                         finish();
                                         Intent mainIntent = new Intent(LoginActivity.this, FileManagerActivity.class);
                                         LoginActivity.this.startActivity(mainIntent);
@@ -122,38 +119,12 @@ public class LoginActivity extends AppCompatActivity  {
                                     Intent mainIntent = new Intent(LoginActivity.this, FileManagerActivity.class);
                                     LoginActivity.this.startActivity(mainIntent);
                                 }
-
                             }catch (SQLException e){
                                 Log.e("in login attempt link", e.toString());
                             }
                         }
                     });
-
-            future.cancel(true);
-
-            isAuthCompleted = false;
         }
-
-        protected void onPostExecute() {
-            mAuthTask = null;
-           try {
-               List<User> users = HelperFactory.getHelper().getUserDAO().getAllUsers();
-               if (isAuthCompleted) {
-
-               } else if (getUserByLogin(users, mEmail) == null) {
-                   {
-                       mPasswordView.setError(getString(R.string.registered));
-                       mPasswordView.requestFocus();
-                   }
-               } else {
-                   mPasswordView.setError(getString(R.string.error_incorrect_password));
-                   mPasswordView.requestFocus();
-               }
-           } catch (SQLException e){
-               Log.e("in login attempt link", e.toString());
-           }
-        }
-
 
     }
 
