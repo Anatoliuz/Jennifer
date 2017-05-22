@@ -6,9 +6,7 @@ import fix.jennifer.userdatadao.User;
 
 import java.sql.SQLException;
 
-/**
- * Created by fix on 16.04.17.
- */
+
 public class ExecutorCreateUser implements Runnable {
     private String login;
     private String password;

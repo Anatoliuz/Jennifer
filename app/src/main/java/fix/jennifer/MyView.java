@@ -6,9 +6,6 @@ import android.graphics.Canvas;
 import android.media.Image;
 import android.view.View;
 
-/**
- * Created by fix on 18.04.17.
- */
 class MyView extends View
 {
     Image image;

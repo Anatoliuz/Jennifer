@@ -1,6 +1,7 @@
 package fix.jennifer;
 
 import android.content.Intent;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,14 +13,18 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import com.google.common.hash.Hashing;
 import fix.jennifer.config.HelperFactory;
 import fix.jennifer.dbexecutor.ExecutorCreateUser;
 import fix.jennifer.executor.DefaultExecutorSupplier;
 import fix.jennifer.userdatadao.User;
 import fix.jennifer.userdatadao.UserImpl;
+
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -29,17 +34,21 @@ public class LoginActivity extends AppCompatActivity  {
     private ExecutorCreateUser ExecutorCreateUser;
     private final Executor executor = Executors.newCachedThreadPool();
 
-    private UserLoginTask mAuthTask = null;
-    private AutoCompleteTextView mEmailView;
+    private EditText mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
 
+    private boolean isAuthCompleted;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        HelperFactory.setHelper(getApplicationContext());
+
+        isAuthCompleted = false;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mEmailView = (EditText)findViewById(R.id.email);
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -70,63 +79,86 @@ public class LoginActivity extends AppCompatActivity  {
     private void attemptLogin() {
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
-        if (mAuthTask == null )
-             mAuthTask = new UserLoginTask(email, password);
-        mAuthTask.auth();
-
+        auth(email, password);
 
     }
 
 
-    public class UserLoginTask {
 
-        private final String mEmail;
-        private final String mPassword;
 
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
 
-        protected void auth() {
 
-            DefaultExecutorSupplier.getInstance().forBackgroundTasks()
-                    .execute(new Runnable() {
+        public void auth(final String email, final String password ) {
+
+            Future future = DefaultExecutorSupplier.getInstance().forBackgroundTasks()
+                    .submit(new Runnable()  {
                         @Override
                         public void run() {
+                            Log.d("Future", "future");
                             try {
-                                String str;
-                                Random rand = new Random();
-                                if(rand.nextInt(1) == 0)
-                                    throw new SQLException();
-                                HelperFactory.setHelper(getApplicationContext());
                                 List<User> users = HelperFactory.getHelper().getUserDAO().getAllUsers();
-                                boolean isHere = isUserInDb(users, mEmail);
+                                boolean isHere = isUserInDb(users, email);
                                 if (isHere) {
-                                    User user = getUserByLogin(users, mEmail);
-                                    if (user.getPassword().equals(mPassword)) {
-                                        str = Boolean.toString(isHere);
+                                    User user = getUserByLogin(users, email);
+                                    String android_id = Settings.Secure.getString(getApplicationContext().getContentResolver(),
+                                            Settings.Secure.ANDROID_ID);
+                                    String passToBeHashed = password + "123";
+                                    final String hashed = Hashing.sha256()
+                                            .hashString(passToBeHashed, StandardCharsets.UTF_8)
+                                            .toString();
+                                    if (user.getPassword().equals(hashed)) {
                                         HelperFactory.getHelper().setUserId(user.getmId());
-                                        Log.d("LOGINN", str);
-                                        finish();
-                                        Intent mainIntent = new Intent(LoginActivity.this, FileManagerActivity.class);
-                                        LoginActivity.this.startActivity(mainIntent);
+                                        isAuthCompleted = true;
                                     }
+                                } else {
+
+                                    String android_id = Settings.Secure.getString(getApplicationContext().getContentResolver(),
+                                            Settings.Secure.ANDROID_ID);
+                                    String passToBeHashed = password + "123";
+                                    final String hashed = Hashing.sha256()
+                                            .hashString(passToBeHashed, StandardCharsets.UTF_8)
+                                            .toString();
+                                    createUserInDb(email, hashed, "a", "a");
+                                    
+                                    isAuthCompleted = true;
+
                                 }
-                                else{
-                                    createUserInDb(mEmail, mPassword, "a", "a");
-                                    finish();
-                                    Intent mainIntent = new Intent(LoginActivity.this, FileManagerActivity.class);
-                                    LoginActivity.this.startActivity(mainIntent);
-                                }
-                            }catch (SQLException e){
+                            } catch (SQLException e) {
                                 Log.e("in login attempt link", e.toString());
                             }
                         }
                     });
+            try {
+                future.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+            future.cancel(true);
+
+            try {
+                List<User> users = HelperFactory.getHelper().getUserDAO().getAllUsers();
+                if (isAuthCompleted) {
+                    finish();
+                    Intent mainIntent = new Intent(LoginActivity.this, FileManagerActivity.class);
+                    LoginActivity.this.startActivity(mainIntent);
+                } else if (getUserByLogin(users, email) == null) {
+                    {
+                        mPasswordView.setError(getString(R.string.registered));
+                        mPasswordView.requestFocus();
+                    }
+                } else {
+                    mPasswordView.setError(getString(R.string.error_incorrect_password));
+                    mPasswordView.requestFocus();
+                }
+            } catch (SQLException e){
+                Log.e("in login attempt link", e.toString());
+            }
         }
 
-    }
+
+
 
     public boolean isUserInDb(List<User> users,String login){
         for (User user: users) {
@@ -152,9 +184,6 @@ public class LoginActivity extends AppCompatActivity  {
         ExecutorCreateUser = new ExecutorCreateUser(login, password, curve_1, curve_2);
         executor.execute(ExecutorCreateUser);
         Log.d("Test db", "onClick: createUser");
-
-
-        
     }
 }
 
