@@ -80,10 +80,30 @@ public class LoginActivity extends AppCompatActivity  {
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
         auth(email, password);
-
+        onPostExecute(email,password);
     }
 
 
+    public void onPostExecute(final String email, final String password){
+        try {
+            List<User> users = HelperFactory.getHelper().getUserDAO().getAllUsers();
+            if (isAuthCompleted) {
+                finish();
+                Intent mainIntent = new Intent(LoginActivity.this, FileManagerActivity.class);
+                LoginActivity.this.startActivity(mainIntent);
+            } else if (getUserByLogin(users, email) == null) {
+                {
+                    mPasswordView.setError(getString(R.string.registered));
+                    mPasswordView.requestFocus();
+                }
+            } else {
+                mPasswordView.setError(getString(R.string.error_incorrect_password));
+                mPasswordView.requestFocus();
+            }
+        } catch (SQLException e){
+            Log.e("in login attempt link", e.toString());
+        }
+    }
 
 
 
@@ -102,7 +122,7 @@ public class LoginActivity extends AppCompatActivity  {
                                     User user = getUserByLogin(users, email);
                                     String android_id = Settings.Secure.getString(getApplicationContext().getContentResolver(),
                                             Settings.Secure.ANDROID_ID);
-                                    String passToBeHashed = password + "123";
+                                    String passToBeHashed = password +  android_id;
                                     final String hashed = Hashing.sha256()
                                             .hashString(passToBeHashed, StandardCharsets.UTF_8)
                                             .toString();
@@ -114,12 +134,12 @@ public class LoginActivity extends AppCompatActivity  {
 
                                     String android_id = Settings.Secure.getString(getApplicationContext().getContentResolver(),
                                             Settings.Secure.ANDROID_ID);
-                                    String passToBeHashed = password + "123";
+                                    String passToBeHashed = password +  android_id;
                                     final String hashed = Hashing.sha256()
                                             .hashString(passToBeHashed, StandardCharsets.UTF_8)
                                             .toString();
                                     createUserInDb(email, hashed, "a", "a");
-                                    
+
                                     isAuthCompleted = true;
 
                                 }
@@ -137,24 +157,7 @@ public class LoginActivity extends AppCompatActivity  {
             }
             future.cancel(true);
 
-            try {
-                List<User> users = HelperFactory.getHelper().getUserDAO().getAllUsers();
-                if (isAuthCompleted) {
-                    finish();
-                    Intent mainIntent = new Intent(LoginActivity.this, FileManagerActivity.class);
-                    LoginActivity.this.startActivity(mainIntent);
-                } else if (getUserByLogin(users, email) == null) {
-                    {
-                        mPasswordView.setError(getString(R.string.registered));
-                        mPasswordView.requestFocus();
-                    }
-                } else {
-                    mPasswordView.setError(getString(R.string.error_incorrect_password));
-                    mPasswordView.requestFocus();
-                }
-            } catch (SQLException e){
-                Log.e("in login attempt link", e.toString());
-            }
+
         }
 
 
