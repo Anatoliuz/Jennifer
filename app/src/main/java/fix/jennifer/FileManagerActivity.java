@@ -39,12 +39,9 @@ public class FileManagerActivity extends AppCompatActivity {
         userSpacePath = getFilesDir().getAbsolutePath()+"/"+folder_main;
         adapter.setDirectory(new File(userSpacePath) );
 
-
-
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.files);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
-
 
         findViewById(R.id.camera).setOnClickListener(new View.OnClickListener() {
             @Override
