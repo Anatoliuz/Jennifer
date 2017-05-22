@@ -152,6 +152,8 @@ public class LoginActivity extends AppCompatActivity  {
         ExecutorCreateUser = new ExecutorCreateUser(login, password, curve_1, curve_2);
         executor.execute(ExecutorCreateUser);
         Log.d("Test db", "onClick: createUser");
+
+
         
     }
 }
