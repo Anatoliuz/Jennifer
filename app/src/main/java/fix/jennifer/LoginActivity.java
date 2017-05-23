@@ -123,8 +123,11 @@ public class LoginActivity extends AppCompatActivity  {
                                             .hashString(passToBeHashed, StandardCharsets.UTF_8)
                                             .toString();
                                     if (user.getPassword().equals(hashed)) {
+                                        int userId = user.getmId();
                                         HelperFactory.getHelper().setUserId(user.getmId());
                                         isAuthCompleted = true;
+
+
                                     }
                                 } else {
 
@@ -135,6 +138,8 @@ public class LoginActivity extends AppCompatActivity  {
                                             .hashString(passToBeHashed, StandardCharsets.UTF_8)
                                             .toString();
                                     createUserInDb(email, hashed, "a", "a");
+                                    User user = getUserByLogin(users, email);
+                                    HelperFactory.getHelper().setUserId(user.getmId());
 
                                     isAuthCompleted = true;
 

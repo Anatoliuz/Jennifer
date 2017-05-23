@@ -41,14 +41,19 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+import fix.jennifer.Pair;
 import fix.jennifer.R;
+import fix.jennifer.algebra.Operations;
 import fix.jennifer.camera.AutoFitTextureView;
 import fix.jennifer.config.HelperFactory;
 import android.text.format.Time;
+import fix.jennifer.ellipticcurves.EllipticCurve;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,7 +62,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-
+import fix.jennifer.Pair;
 public class CameraFragment extends Fragment
         implements View.OnClickListener, FragmentCompat.OnRequestPermissionsResultCallback {
 
@@ -744,9 +749,30 @@ public class CameraFragment extends Fragment
             byte[] bytes = new byte[buffer.remaining()];
             buffer.get(bytes);
             FileOutputStream output = null;
+
+
+
+            String testS = "qwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop";
+            byte[] test = testS.getBytes();
+            //!!
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            EllipticCurve curve = new EllipticCurve("id");
+
+            // генерируем закрытый и открытый ключи
+            BigInteger secretKey = Operations.getSecretKey();
+            fix.jennifer.algebra.Point openKey = Operations.algMult(curve, secretKey, curve.getBasePoint());
+
+
+
             try {
                 output = new FileOutputStream(mFile);
                 output.write(bytes);
+//                out.write(test);
+//                System.out.println(out.toString());
+//                out.reset();
+//                Pair<byte[], ArrayList<fix.jennifer.algebra.Point>> cipherText = Operations.encrypt(curve, bytes, openKey);
+//                out.write(cipherText.getKey());
+
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
