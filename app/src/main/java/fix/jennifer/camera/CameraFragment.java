@@ -43,6 +43,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 import fix.jennifer.R;
 import fix.jennifer.camera.AutoFitTextureView;
+import fix.jennifer.config.HelperFactory;
+import android.text.format.Time;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -300,7 +302,18 @@ public class CameraFragment extends Fragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mFile = new File(getActivity().getExternalFilesDir(null), "pic.jpg");
+        int folderId =  HelperFactory.getHelper().getUserId();
+        String intstr;
+        intstr = Integer.toString(folderId);
+        String folder_main = intstr;
+        File f = new File( getContext().getFilesDir().getAbsolutePath(), folder_main);
+        if (!f.exists()) {
+            f.mkdirs();
+        }
+        String userSpacePath =getContext().getFilesDir().getAbsolutePath()+"/"+folder_main;
+        Time now = new Time();
+        now.setToNow();
+        mFile = new File(userSpacePath+"/" +now.format("%d%m%Y%H%M%S"));
     }
 
     @Override
@@ -308,10 +321,6 @@ public class CameraFragment extends Fragment
         super.onResume();
         startBackgroundThread();
 
-        // When the screen is turned off and turned back on, the SurfaceTexture is already
-        // available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
-        // a camera and start preview from here (otherwise, we wait until the surface is ready in
-        // the SurfaceTextureListener).
         if (mTextureView.isAvailable()) {
             openCamera(mTextureView.getWidth(), mTextureView.getHeight());
         } else {
@@ -440,8 +449,6 @@ public class CameraFragment extends Fragment
         } catch (CameraAccessException e) {
             e.printStackTrace();
         } catch (NullPointerException e) {
-            // Currently an NPE is thrown when the Camera2API is used but not supported on the
-            // device this code runs.
             ErrorDialog.newInstance(getString(R.string.camera_error))
                     .show(getChildFragmentManager(), FRAGMENT_DIALOG);
         }

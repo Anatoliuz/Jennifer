@@ -22,7 +22,6 @@ public class ExecutorCreateUser implements Runnable {
 
     @Override
     public void run(){
-        // sleep is only to show gui not blocking
 
         try{
             Thread.sleep(1000);
