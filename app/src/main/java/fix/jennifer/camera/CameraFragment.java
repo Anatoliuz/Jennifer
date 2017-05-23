@@ -63,6 +63,8 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import fix.jennifer.Pair;
+import fix.jennifer.executor.DefaultExecutorSupplier;
+
 public class CameraFragment extends Fragment
         implements View.OnClickListener, FragmentCompat.OnRequestPermissionsResultCallback {
 
@@ -746,45 +748,37 @@ public class CameraFragment extends Fragment
         @Override
         public void run() {
             ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
-            byte[] bytes = new byte[buffer.remaining()];
+            final byte[] bytes = new byte[buffer.remaining()];
             buffer.get(bytes);
-            FileOutputStream output = null;
 
 
-
-            String testS = "qwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop";
-            byte[] test = testS.getBytes();
-            //!!
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            EllipticCurve curve = new EllipticCurve("id");
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        final     EllipticCurve curve = new EllipticCurve("id");
 
             // генерируем закрытый и открытый ключи
-            BigInteger secretKey = Operations.getSecretKey();
-            fix.jennifer.algebra.Point openKey = Operations.algMult(curve, secretKey, curve.getBasePoint());
+         final   BigInteger secretKey = Operations.getSecretKey();
+          final  fix.jennifer.algebra.Point openKey = Operations.algMult(curve, secretKey, curve.getBasePoint());
 
+            DefaultExecutorSupplier.getInstance().forBackgroundTasks()
+                    .execute(new Runnable() {
+                        @Override
+                        public void run() {
 
+                            try {
 
-            try {
-                output = new FileOutputStream(mFile);
-                output.write(bytes);
+                                final FileOutputStream output = new FileOutputStream(mFile);
+
 //                out.write(test);
 //                System.out.println(out.toString());
 //                out.reset();
-//                Pair<byte[], ArrayList<fix.jennifer.algebra.Point>> cipherText = Operations.encrypt(curve, bytes, openKey);
-//                out.write(cipherText.getKey());
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                mImage.close();
-                if (null != output) {
-                    try {
-                        output.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+                       //Pair<byte[], ArrayList<fix.jennifer.algebra.Point>> cipherText = Operations.encrypt(curve, bytes, openKey);
+                  // output.write(cipherText.getKey());
+                                output.write(bytes);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
         }
 
     }
