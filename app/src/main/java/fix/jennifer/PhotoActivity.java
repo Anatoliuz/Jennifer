@@ -26,6 +26,7 @@ public class PhotoActivity extends ActionBarActivity {
         File imageFile = new  File(value);
         if(imageFile.exists()){
             ImageView imageView= (ImageView) findViewById(R.id.imageView);
+            imageView.setRotation(90);
             imageView.setImageBitmap(BitmapFactory.decodeFile(imageFile.getAbsolutePath()));
         }
 
