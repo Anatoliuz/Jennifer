@@ -60,6 +60,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import fix.jennifer.Pair;
@@ -753,32 +755,36 @@ public class CameraFragment extends Fragment
 
 
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        final     EllipticCurve curve = new EllipticCurve("id");
+            final     EllipticCurve curve = new EllipticCurve("id");
 
             // генерируем закрытый и открытый ключи
-         final   BigInteger secretKey = Operations.getSecretKey();
-          final  fix.jennifer.algebra.Point openKey = Operations.algMult(curve, secretKey, curve.getBasePoint());
+            final   BigInteger secretKey = Operations.getSecretKey();
+            final  fix.jennifer.algebra.Point openKey = Operations.algMult(curve, secretKey, curve.getBasePoint());
 
-            DefaultExecutorSupplier.getInstance().forBackgroundTasks()
-                    .execute(new Runnable() {
+            Future future = DefaultExecutorSupplier.getInstance().forBackgroundTasks()
+                    .submit(new Runnable() {
+
                         @Override
                         public void run() {
-
                             try {
-
-                                final FileOutputStream output = new FileOutputStream(mFile);
-
-//                out.write(test);
-//                System.out.println(out.toString());
-//                out.reset();
-                       //Pair<byte[], ArrayList<fix.jennifer.algebra.Point>> cipherText = Operations.encrypt(curve, bytes, openKey);
-                  // output.write(cipherText.getKey());
-                                output.write(bytes);
+                                 final FileOutputStream output = new FileOutputStream(mFile);
+                                  Pair<byte[], ArrayList<fix.jennifer.algebra.Point>> cipherText = Operations.encrypt(curve, bytes, openKey);
+                                  output.write(cipherText.getKey());
+                                //output.write(bytes);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
                         }
                     });
+
+            try {
+                future.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+            future.cancel(true);
         }
 
     }
