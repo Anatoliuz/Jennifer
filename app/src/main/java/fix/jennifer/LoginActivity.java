@@ -13,10 +13,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import com.google.common.hash.Hashing;
+import fix.jennifer.algebra.Operations;
 import fix.jennifer.config.HelperFactory;
 import fix.jennifer.dbexecutor.ExecutorCreateUser;
+import fix.jennifer.ellipticcurves.EllipticCurve;
 import fix.jennifer.executor.DefaultExecutorSupplier;
 import fix.jennifer.userdatadao.User;
+
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.List;
@@ -101,9 +105,6 @@ public class LoginActivity extends AppCompatActivity  {
         }
     }
 
-
-
-
         public void auth(final String email, final String password ) {
 
             Future future = DefaultExecutorSupplier.getInstance().forBackgroundTasks()
@@ -111,11 +112,12 @@ public class LoginActivity extends AppCompatActivity  {
                         @Override
                         public void run() {
                             Log.d("Future", "future");
+                            User user;
                             try {
                                 List<User> users = HelperFactory.getHelper().getUserDAO().getAllUsers();
                                 boolean isHere = isUserInDb(users, email);
                                 if (isHere) {
-                                    User user = getUserByLogin(users, email);
+                                     user = getUserByLogin(users, email);
                                     String android_id = Settings.Secure.getString(getApplicationContext().getContentResolver(),
                                             Settings.Secure.ANDROID_ID);
                                     String passToBeHashed = password +  android_id;
@@ -126,7 +128,9 @@ public class LoginActivity extends AppCompatActivity  {
                                         int userId = user.getmId();
                                         HelperFactory.getHelper().setUserId(user.getmId());
                                         isAuthCompleted = true;
-
+                                        String cve = user.getCurve_1();
+                                         HelperFactory.getHelper().generateCurve("id");
+                                         HelperFactory.getHelper().setSecretKey(new BigInteger(user.getCurve_1() ) );//?
 
                                     }
                                 } else {
@@ -137,9 +141,14 @@ public class LoginActivity extends AppCompatActivity  {
                                     final String hashed = Hashing.sha256()
                                             .hashString(passToBeHashed, StandardCharsets.UTF_8)
                                             .toString();
-                                    createUserInDb(email, hashed, "a", "a");
-                                    User user = getUserByLogin(users, email);
+                                    HelperFactory.getHelper().generateCurve("id");
+                                    EllipticCurve curve =   HelperFactory.getHelper().getCurve();
+                                    BigInteger secretKey = Operations.getSecretKey();
+
+                                    createUserInDb(email, hashed, secretKey.toString(), "b");
+                                    user = getUserByLogin(users, email);
                                     HelperFactory.getHelper().setUserId(user.getmId());
+                                    HelperFactory.getHelper().setSecretKey(secretKey );
 
                                     isAuthCompleted = true;
 
@@ -160,8 +169,6 @@ public class LoginActivity extends AppCompatActivity  {
 
 
         }
-
-
 
 
     public boolean isUserInDb(List<User> users,String login){

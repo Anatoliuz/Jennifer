@@ -6,9 +6,12 @@ import android.util.Log;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
+import fix.jennifer.algebra.Operations;
+import fix.jennifer.ellipticcurves.EllipticCurve;
 import fix.jennifer.userdatadao.User;
 import fix.jennifer.userdatadao.UserImpl;
 
+import java.math.BigInteger;
 import java.sql.SQLException;
 
 /**
@@ -22,6 +25,10 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
     private static final int DATABASE_VERSION = 8;
 
     private static int userId;
+
+    private  EllipticCurve curve;
+
+    private  BigInteger secretKey;
 
     private UserImpl userDAO =  null;
 
@@ -64,12 +71,30 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
         super.close();
         userDAO = null;
     }
-    public static void setUserId(int id){
+    public  void setUserId(int id){
         userId = id;
     }
 
-    public static int getUserId(){
+    public  int getUserId(){
         return userId;
     }
+
+    public  void generateCurve(String id){
+        curve = new EllipticCurve(id);
+    }
+
+
+    public  EllipticCurve getCurve(){
+        return curve;
+    }
+
+    public  void setSecretKey(BigInteger s){
+        secretKey = s;
+    }
+
+    public  BigInteger getSecretKey(){
+        return secretKey;
+    }
+
 
 }

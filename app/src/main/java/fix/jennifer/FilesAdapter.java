@@ -107,6 +107,7 @@ class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.FileViewHolder> {
                         FilesAdapter.this.setDirectory(file);
                     }
                     else{
+
                         Intent intent = new Intent(context.getApplicationContext(), PhotoActivity.class);
                         intent.putExtra("key",file.getAbsolutePath());
                         context.getApplicationContext().startActivity(intent);

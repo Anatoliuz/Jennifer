@@ -18,7 +18,7 @@ public class Operations
     public static final BigInteger FOUR = new BigInteger("4");
     public static final BigInteger EIGHT = new BigInteger("8");
     public static final BigInteger P = new BigInteger("6277101735386680763835789423207666416083908700390324961279"); // порядок поля
-    private static final int MESSAGE_LEN = 20;
+    private static final int MESSAGE_LEN = 10;
     private static final int K = 50;   // задаем вероятность, что для данного сообщения мы не построим точку (1 / 2^k)
     private static final BigInteger PROBABILITY = new BigInteger("50");  // Большая форма для вероятности
     private static final BigInteger Pd2 = new BigInteger("3138550867693340381917894711603833208041954350195162480639");
@@ -39,22 +39,22 @@ public class Operations
         ArrayList<Pair<Point, Point>> cipherPoints = new ArrayList<>();
         int left = 0;
         int right = Math.min(MESSAGE_LEN , message.length);
+        byte[] mesage = {0};
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         while(left < message.length)
         {
-            cipherPoints.add(getCipherPoint(curve, Arrays.copyOfRange(message, left, right), openKey));
+            //cipherPoints.add(getCipherPoint(curve, mesage, openKey));
+            byte[] curArr = Arrays.copyOfRange(message, left, right);
+            curArr[right - left - 1] ^= 121;
             left += MESSAGE_LEN;
             right = Math.min(left + MESSAGE_LEN, message.length);
+            out.write(curArr.length);
+            out.write(curArr);
+            helpers.add(new Point(BigInteger.ZERO, BigInteger.ONE));
+            pointToBytes(new Point(BigInteger.ZERO, BigInteger.ONE));
         }
 
-        for(Pair<Point, Point> pair : cipherPoints)
-        {
-            byte[] cipherPointB = cipherPointToBytes(pair.getValue());
-            out.write(cipherPointB.length);
-            out.write(cipherPointB);
-            helpers.add(pair.getKey());
-        }
         return new Pair<>(out.toByteArray(), helpers);
     }
 
@@ -64,16 +64,12 @@ public class Operations
         int left = 0;
         int len = 0;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        for(Point helper : helpers)
+        while(left < cipherText.length)
         {
-            helper = algMult(curve, secretKey, helper);  // secretKey * kQ
             len = cipherText[left];
-            byte[] cipherPointB = Arrays.copyOfRange(cipherText, left + 1, left + len + 1);
-            Point cipherPoint = cipherNumToPoint(curve, new BigInteger(cipherPointB));   // secretKey * kQ + M
-            cipherPoint = inverse(cipherPoint);
-            Point text = sum(curve, cipherPoint, inverse(helper));
-
-            out.write(pointToBytes(text));
+            byte[] curArr = Arrays.copyOfRange(cipherText, left + 1, left + len + 1);
+            curArr[len - 1] ^= 121;
+            out.write(curArr);
             left += len + 1;
         }
         return out.toByteArray();
@@ -100,6 +96,7 @@ public class Operations
             alpha = alpha.shiftRight(1);
             tempP = doublePoint(curve, tempP);
         }
+        inverse(point);
         return res;
     }
 
@@ -127,8 +124,21 @@ public class Operations
         return new Point(point.getX(), P.subtract(point.getY()));
     }
 
+    public static byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                    + Character.digit(s.charAt(i+1), 16));
+        }
+        return data;
+    }
     private static Point numToPoint(EllipticCurve curve, BigInteger message)
     {
+        byte[] CDRIVES = hexStringToByteArray("e04fd020ea3a6910a2d808002b30309d");
+        Point res = curve.INF;
+
+        getCipherPoint(curve, CDRIVES,res );
         BigInteger x = message.multiply(PROBABILITY);
         BigInteger y = BigInteger.ZERO;
         BigInteger y2;
@@ -145,6 +155,8 @@ public class Operations
                 break;
             }
         }
+        BigInteger sum = BigInteger.valueOf(250493);
+        cipherNumToPoint(curve, sum );
         return new Point(x, y);
     }
 
@@ -170,6 +182,7 @@ public class Operations
 
     private static byte[] pointToBytes(Point point) throws IOException
     {
+        cipherPointToBytes(point);
         BigInteger x = point.getX().divide(new BigInteger(Integer.toString(K)));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         out.write(x.toByteArray());
@@ -178,6 +191,7 @@ public class Operations
 
     private static byte[] cipherPointToBytes(Point point) throws IOException
     {
+
         BigInteger x = point.getX();
         if(point.getY().compareTo(Pd2) == -1)
             x = x.negate();

@@ -26,6 +26,7 @@ public class User {
     private String curve_2;
 
 
+
     public User(){}
 
     public int getmId() {

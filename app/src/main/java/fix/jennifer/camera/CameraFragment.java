@@ -9,11 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.ImageFormat;
-import android.graphics.Matrix;
-import android.graphics.Point;
-import android.graphics.RectF;
-import android.graphics.SurfaceTexture;
+import android.graphics.*;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -49,10 +45,7 @@ import fix.jennifer.config.HelperFactory;
 import android.text.format.Time;
 import fix.jennifer.ellipticcurves.EllipticCurve;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -735,7 +728,7 @@ public class CameraFragment extends Fragment
                     CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
         }
     }
-
+    static FileOutputStream output;
     private static class ImageSaver implements Runnable {
 
         private final Image mImage;
@@ -752,39 +745,41 @@ public class CameraFragment extends Fragment
             ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
             final byte[] bytes = new byte[buffer.remaining()];
             buffer.get(bytes);
-
-
-            final ByteArrayOutputStream out = new ByteArrayOutputStream();
-            final     EllipticCurve curve = new EllipticCurve("id");
-
-            // генерируем закрытый и открытый ключи
-            final   BigInteger secretKey = Operations.getSecretKey();
+            final  BigInteger secretKey = HelperFactory.getHelper().getSecretKey();
+            final  EllipticCurve curve = HelperFactory.getHelper().getCurve();
             final  fix.jennifer.algebra.Point openKey = Operations.algMult(curve, secretKey, curve.getBasePoint());
 
-            Future future = DefaultExecutorSupplier.getInstance().forBackgroundTasks()
-                    .submit(new Runnable() {
-
+            DefaultExecutorSupplier.getInstance().forBackgroundTasks()
+                    .execute(new Runnable() {
                         @Override
                         public void run() {
                             try {
-                                 final FileOutputStream output = new FileOutputStream(mFile);
-                                  Pair<byte[], ArrayList<fix.jennifer.algebra.Point>> cipherText = Operations.encrypt(curve, bytes, openKey);
-                                  output.write(cipherText.getKey());
-                                //output.write(bytes);
-                            } catch (IOException e) {
+                                output = new FileOutputStream(mFile);
+                                Pair<byte[], ArrayList<fix.jennifer.algebra.Point>> cipherText = Operations.encrypt(curve, bytes, openKey);
+                                output.write(cipherText.getKey());
+
+                            }catch (IOException e) {
                                 e.printStackTrace();
+                            }
+                            finally
+                            {
+                                mImage.close();
+                                if (null != output)
+                                {
+                                    try
+                                    {
+                                        output.close();
+                                    }
+                                    catch (IOException e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+                                }
                             }
                         }
                     });
 
-            try {
-                future.get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-            future.cancel(true);
+
         }
 
     }
