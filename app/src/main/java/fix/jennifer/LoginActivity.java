@@ -16,7 +16,6 @@ import com.google.common.hash.Hashing;
 import fix.jennifer.algebra.Operations;
 import fix.jennifer.config.HelperFactory;
 import fix.jennifer.dbexecutor.ExecutorCreateUser;
-import fix.jennifer.ellipticcurves.EllipticCurve;
 import fix.jennifer.executor.DefaultExecutorSupplier;
 import fix.jennifer.userdatadao.User;
 
@@ -111,7 +110,6 @@ public class LoginActivity extends AppCompatActivity  {
                     .submit(new Runnable()  {
                         @Override
                         public void run() {
-                            Log.d("Future", "future");
                             User user;
                             try {
                                 List<User> users = HelperFactory.getHelper().getUserDAO().getAllUsers();
@@ -125,12 +123,10 @@ public class LoginActivity extends AppCompatActivity  {
                                             .hashString(passToBeHashed, StandardCharsets.UTF_8)
                                             .toString();
                                     if (user.getPassword().equals(hashed)) {
-                                        int userId = user.getmId();
                                         HelperFactory.getHelper().setUserId(user.getmId());
                                         isAuthCompleted = true;
-                                        String cve = user.getCurve_1();
                                          HelperFactory.getHelper().generateCurve("id");
-                                         HelperFactory.getHelper().setSecretKey(new BigInteger(user.getCurve_1() ) );//?
+                                         HelperFactory.getHelper().setSecretKey(new BigInteger(user.getCurve_1() ) );
 
                                     }
                                 } else {
@@ -142,7 +138,6 @@ public class LoginActivity extends AppCompatActivity  {
                                             .hashString(passToBeHashed, StandardCharsets.UTF_8)
                                             .toString();
                                     HelperFactory.getHelper().generateCurve("id");
-                                    EllipticCurve curve =   HelperFactory.getHelper().getCurve();
                                     BigInteger secretKey = Operations.getSecretKey();
 
                                     createUserInDb(email, hashed, secretKey.toString(), "b");
@@ -191,10 +186,8 @@ public class LoginActivity extends AppCompatActivity  {
     public void createUserInDb( String login, String password, String curve_1,
                                 String curve_2 ){
         HelperFactory.setHelper(getApplicationContext());
-        Log.d("CreateUserInDb db", "onClick: title content link"+ login + password + curve_1 + curve_2);
         ExecutorCreateUser = new ExecutorCreateUser(login, password, curve_1, curve_2);
         executor.execute(ExecutorCreateUser);
-        Log.d("Test db", "onClick: createUser");
     }
 }
 

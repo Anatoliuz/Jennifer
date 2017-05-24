@@ -1,10 +1,7 @@
 package fix.jennifer.userdatadao;
 
-import android.content.Intent;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
-
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 

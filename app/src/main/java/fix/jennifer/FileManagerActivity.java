@@ -22,7 +22,7 @@ public class FileManagerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-         setContentView(R.layout.activity_file_manager);
+        setContentView(R.layout.activity_file_manager);
         adapter = new FilesAdapter(this);
 
         int folderId =  HelperFactory.getHelper().getUserId();
