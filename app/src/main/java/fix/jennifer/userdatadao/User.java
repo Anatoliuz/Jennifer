@@ -19,8 +19,7 @@ public class User {
     @DatabaseField(dataType = DataType.STRING)
     private String password;
 
-    @DatabaseField(dataType = DataType.STRING)
-    private String curve_1;
+
 
 
 
@@ -39,9 +38,6 @@ public class User {
         return password;
     }
 
-    public String getCurve_1() {
-        return curve_1;
-    }
 
     public void setmId(int mId) {
         this.mId = mId;
@@ -55,8 +51,6 @@ public class User {
         this.password = password;
     }
 
-    public void setCurve_1(String curve_1) {
-        this.curve_1 = curve_1;
-    }
+
 
 }

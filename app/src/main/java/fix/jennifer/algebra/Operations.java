@@ -23,14 +23,10 @@ public class Operations
     private static final BigInteger PROBABILITY = new BigInteger("50");  // Большая форма для вероятности
     private static final BigInteger Pd2 = new BigInteger("3138550867693340381917894711603833208041954350195162480639");
 
-    public static BigInteger getSecretKey()
+    public static BigInteger getSecretKey(String hashed)
     {
-        String secretS = "";
-        SecureRandom rand = new SecureRandom();
-
-        for(int i = 0; i < Operations.MESSAGE_LEN; ++i)
-            secretS += (char)(rand.nextInt(10) + '0');
-        return new BigInteger(secretS);
+        BigInteger k = new BigInteger(hashed.getBytes());
+        return k.mod(P);
     }
 
     public static Pair<byte[], ArrayList<Point>> encrypt(EllipticCurve curve, byte[] message, Point openKey) throws IOException

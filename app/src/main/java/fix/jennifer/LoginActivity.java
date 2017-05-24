@@ -160,8 +160,10 @@ public class LoginActivity extends AppCompatActivity  {
                                     if (user.getPassword().equals(hashed)) {
                                         HelperFactory.getHelper().setUserId(user.getmId());
                                         isAuthCompleted = true;
-                                         HelperFactory.getHelper().generateCurve("id");
-                                         HelperFactory.getHelper().setSecretKey(new BigInteger(user.getCurve_1() ) );
+                                         HelperFactory.getHelper().generateCurve(hashed);
+                                        BigInteger secretKey = Operations.getSecretKey(hashed);
+
+                                        HelperFactory.getHelper().setSecretKey(secretKey );
 
                                     }
                                 } else {
@@ -172,14 +174,12 @@ public class LoginActivity extends AppCompatActivity  {
                                     final String hashed = Hashing.sha256()
                                             .hashString(passToBeHashed, StandardCharsets.UTF_8)
                                             .toString();
-                                    HelperFactory.getHelper().generateCurve("id");
-                                    BigInteger secretKey = Operations.getSecretKey();
-
-                                    createUserInDb(email, hashed, secretKey.toString());
+                                    HelperFactory.getHelper().generateCurve(hashed);
+                                    BigInteger secretKey = Operations.getSecretKey(hashed);
+                                    HelperFactory.getHelper().setSecretKey(secretKey );
+                                    createUserInDb(email, hashed);
                                     user = getUserByLogin(users, email);
                                     HelperFactory.getHelper().setUserId(user.getmId());
-                                    HelperFactory.getHelper().setSecretKey(secretKey );
-
                                     isAuthCompleted = true;
 
                                 }
@@ -218,9 +218,9 @@ public class LoginActivity extends AppCompatActivity  {
         }
         return null;
     }
-    public void createUserInDb( String login, String password, String curve_1){
+    public void createUserInDb( String login, String password){
         HelperFactory.setHelper(getApplicationContext());
-        ExecutorCreateUser = new ExecutorCreateUser(login, password, curve_1);
+        ExecutorCreateUser = new ExecutorCreateUser(login, password);
         executor.execute(ExecutorCreateUser);
     }
 }
