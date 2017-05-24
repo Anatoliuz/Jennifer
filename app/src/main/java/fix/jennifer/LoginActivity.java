@@ -75,13 +75,10 @@ public class LoginActivity extends AppCompatActivity  {
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-
         return email.contains("@");
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() > 4;
     }
 
@@ -92,19 +89,15 @@ public class LoginActivity extends AppCompatActivity  {
         mEmailView.setError(null);
         mPasswordView.setError(null);
 
-        // Store values at the time of the login attempt
-
         boolean cancel = false;
         View focusView = null;
 
-        // Check for a valid password, if the user entered one.
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
         }
 
-        // Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
@@ -116,8 +109,6 @@ public class LoginActivity extends AppCompatActivity  {
         }
 
         if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
             focusView.requestFocus();
         } else {
             auth(email, password);
@@ -184,7 +175,7 @@ public class LoginActivity extends AppCompatActivity  {
                                     HelperFactory.getHelper().generateCurve("id");
                                     BigInteger secretKey = Operations.getSecretKey();
 
-                                    createUserInDb(email, hashed, secretKey.toString(), "b");
+                                    createUserInDb(email, hashed, secretKey.toString());
                                     user = getUserByLogin(users, email);
                                     HelperFactory.getHelper().setUserId(user.getmId());
                                     HelperFactory.getHelper().setSecretKey(secretKey );
@@ -227,10 +218,9 @@ public class LoginActivity extends AppCompatActivity  {
         }
         return null;
     }
-    public void createUserInDb( String login, String password, String curve_1,
-                                String curve_2 ){
+    public void createUserInDb( String login, String password, String curve_1){
         HelperFactory.setHelper(getApplicationContext());
-        ExecutorCreateUser = new ExecutorCreateUser(login, password, curve_1, curve_2);
+        ExecutorCreateUser = new ExecutorCreateUser(login, password, curve_1);
         executor.execute(ExecutorCreateUser);
     }
 }

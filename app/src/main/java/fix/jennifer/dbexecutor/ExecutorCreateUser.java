@@ -11,13 +11,13 @@ public class ExecutorCreateUser implements Runnable {
     private String login;
     private String password;
     private String curve_1;
-    private String curve_2;
 
-    public ExecutorCreateUser(String login, String password, String curve_1, String curve_2){
+
+    public ExecutorCreateUser(String login, String password, String curve_1){
         this.login = login;
         this.password = password;
         this.curve_1 = curve_1;
-        this.curve_2 = curve_2;
+
     }
 
     @Override
@@ -33,7 +33,6 @@ public class ExecutorCreateUser implements Runnable {
             newUser.setLogin(login);
             newUser.setPassword(password);
             newUser.setCurve_1(curve_1);
-            newUser.setCurve_2(curve_2);
             HelperFactory.getHelper().getUserDAO().setNewUsers(newUser);
         }catch (SQLException e){
             Log.e("in create link", e.toString());
