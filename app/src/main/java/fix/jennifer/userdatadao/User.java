@@ -4,9 +4,7 @@ import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-/**
- * Created by fix on 16.04.17.
- */
+
 @DatabaseTable(tableName = "User")
 public class User {
 
@@ -18,10 +16,6 @@ public class User {
 
     @DatabaseField(dataType = DataType.STRING)
     private String password;
-
-
-
-
 
 
     public User(){}
@@ -38,7 +32,6 @@ public class User {
         return password;
     }
 
-
     public void setmId(int mId) {
         this.mId = mId;
     }
@@ -50,7 +43,4 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-
-
-
 }

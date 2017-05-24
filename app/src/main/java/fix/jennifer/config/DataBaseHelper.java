@@ -6,7 +6,6 @@ import android.util.Log;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
-import fix.jennifer.algebra.Operations;
 import fix.jennifer.ellipticcurves.EllipticCurve;
 import fix.jennifer.userdatadao.User;
 import fix.jennifer.userdatadao.UserImpl;
@@ -14,9 +13,7 @@ import fix.jennifer.userdatadao.UserImpl;
 import java.math.BigInteger;
 import java.sql.SQLException;
 
-/**
- * Created by fix on 16.04.17.
- */
+
 public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
     private static final String TAG = DataBaseHelper.class.getSimpleName();
 
